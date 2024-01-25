@@ -3,7 +3,6 @@ import '../models/user.dart';
 import '../services/registration_service.dart';
 import '../screens/group_setup_screen.dart';
 
-
 class RegistrationScreen extends StatelessWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
 
@@ -30,50 +29,36 @@ class _RegistrationFormState extends State<RegistrationForm> {
   bool _isLoading = false;
 
   void _registerUser() async {
+  setState(() {
+    _isLoading = true;
+  });
+
+  try {
+    User newUser = await RegistrationService.registerUser(_nameController.text);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('User registered successfully'),
+      ),
+    );
+
+    // Pass the user data back to the previous screen
+    Navigator.pop(context, newUser);
+  } catch (e) {
+    print('Registration error: $e');
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Registration error: $e'),
+      ),
+    );
+  } finally {
     setState(() {
-      _isLoading = true;
+      _isLoading = false;
     });
-
-    try {
-      // Call registration service to register the user
-      User newUser = await RegistrationService.registerUser(_nameController.text);
-
-      // Navigate to the next screen or perform any other action
-      // For now, let's print the registered user's information
-      print('Registered User: ${newUser.name}, ID: ${newUser.id}');
-
-      // Show a SnackBar without directly using the BuildContext
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('User registered successfully'),
-        ),
-      );
-
-      // Navigate to the next screen (replace with your actual navigation logic)
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const GroupSetupScreen(), // Replace with your next screen
-        ),
-      );
-    } catch (e) {
-      // Handle registration error (e.g., display an error message)
-      print('Registration error: $e');
-
-      // Show a SnackBar for registration error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Registration error: $e'),
-        ),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +75,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: _isLoading ? null : _registerUser,
-              child: _isLoading ? const CircularProgressIndicator() : const Text('Register'),
+              child: _isLoading
+                  ? const CircularProgressIndicator()
+                  : const Text('Register'),
             ),
           ],
         ),

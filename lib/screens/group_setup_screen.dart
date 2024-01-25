@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:task_tender/screens/item_list_screen.dart';
 import 'package:task_tender/screens/schedule_screen.dart';
 import '../services/group_service.dart';
+import '../screens/create_group_screen.dart';
 
 class GroupSetupScreen extends StatelessWidget {
   const GroupSetupScreen({super.key});
@@ -28,32 +30,22 @@ class _GroupSetupFormState extends State<GroupSetupForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextField(
-            controller: _groupNameController,
-            decoration: const InputDecoration(labelText: 'Group Name'),
-          ),
-          const SizedBox(height: 16.0),
-          ElevatedButton(
-            onPressed: () {
-              // Call group service to create a new group
-              GroupService.createGroup(_groupNameController.text);
-              //Navigator.pop(context); // Navigate back to the previous screen
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      const ScheduleScreen(), // Replace with your next screen
-                ),
-              );
-            },
-            child: const Text('Create Group'),
-          ),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Group Setup'),
+      ),
+      body: const GroupSetupForm(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Navigate to a screen to create a group
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CreateGroupScreen(),
+            ),
+          );
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
